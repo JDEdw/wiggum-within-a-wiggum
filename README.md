@@ -135,14 +135,34 @@ The pattern is domain-agnostic. To apply it:
 - **Customer support agent** — taxonomy: incorrect information, tone violations, missed escalation triggers
 - **Data pipeline agent** — taxonomy: schema drift, null rate spikes, late delivery, duplicate records
 
-## Prior Art
+## Prior Art & How This Differs
 
-The basic Ralph Wiggum technique is documented by [Geoffrey Huntley](https://ghuntley.com/specs) and [Addy Osmani](https://addyosmani.com/blog/self-correcting-agents/). The self-reflection loop is well-established.
+The Ralph Wiggum technique has a rich ecosystem:
+- [Official Claude Code plugin](https://github.com/anthropics/claude-code/tree/main/plugins/ralph-wiggum) by Anthropic
+- [Geoffrey Huntley's original](https://github.com/ghuntley/how-to-ralph-wiggum)
+- [ralph-orchestrator](https://github.com/mikeyobrien/ralph-orchestrator) — supports Telegram, multi-backend
+- [Goose Ralph Loop](https://block.github.io/goose/docs/tutorials/ralph-loop/) — cross-model review
 
-What WwW adds:
-- **Two-agent architecture** with asymmetric capabilities and clear role separation
-- **Meta-Loop** as a pre-deployment confidence-building technique
-- **Independence threshold** with human-gated graduation
+WwW extends these with specific additions not found elsewhere in the literature:
+
+**Independence threshold:** The worker agent earns autonomy by hitting a consecutive ZD streak. The system tracks progress toward a specific target (5 consecutive ZDs) and the human confirms release. No existing implementation documents this pattern.
+
+**Formal defect taxonomy:** D1-D12 with hard fail categories (exit code 1 regardless of total count). Quality is measured against a domain-specific taxonomy, not just pass/fail tests.
+
+**Meta-Loop as confidence building:** Running the loop to build probabilistic pipeline confidence before deployment — tracking component confidence levels and watching them rise with each clean cycle. The math is explicit and honest.
+
+**Coach never does the worker's job:** A hard rule that the coach agent never produces output directly. Every time the coach fixes content, the worker's path to independence gets longer.
+
+If you've seen these patterns documented elsewhere — please open an issue. Happy to be wrong.
+
+## Requirements
+
+The examples in this repo use:
+- [OpenClaw](https://openclaw.dev) — the agent framework running Sam on the Pi
+- Ollama — local LLM inference
+- A Telegram bot token (for notifications)
+
+The WwW pattern itself is framework-agnostic. The defect taxonomy, coaching architecture, and independence threshold work with any agent framework. Adapt the example files to your stack.
 
 ## License
 
